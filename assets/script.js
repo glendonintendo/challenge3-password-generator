@@ -1,7 +1,8 @@
 /* 
   onclick of generate password button, 
   prompts user to choose password length and type of characters, 
-  and then generates a password with those specifications
+  generates a password with those specifications,
+  and displays it in the html textarea
 */
 
 /* 
@@ -22,7 +23,6 @@ let characters = {
         selectedCharTypes.push(Object.keys(this)[i]);
       }
     }
-    console.log(selectedCharTypes);
     return selectedCharTypes;
   },
 
@@ -86,53 +86,61 @@ var getCharBools = function() {
   }
 };
 
+/*
+  takes in previous user inputs about password and creates a string of those inputs
+*/
+let getFinalValidate = function (num, arr) {
+  let charTypeString = "";
+  for (i = 0; i < arr.length; i++) {
+    if (i === 0) {
+      charTypeString += arr[i];
+    } else if (i !== arr.length - 1) {
+      charTypeString += ", " + arr[i];
+    } else if (arr.length !== 2) {
+      charTypeString += ", and " + arr[i];
+    } else {
+      charTypeString += " and " + arr[i];
+    }
+  }
+  let validateString = `So, you would like a password that is ${num} characters long and contains ${charTypeString} characters?`;
+  return validateString;
+};
+
 /* 
   creates a password using previously defined object properties, object methods, and function expressions
 */
 var generatePassword = function() {
-  // calls getNumChar to get length of generated password; if numCharActual is falsy, passes undefined
-  var numCharActual = getNumChar();
-  if (!numCharActual) {
+  // calls getNumChar to get length of generated password; if numChar is falsy, passes undefined
+  var numChar = getNumChar();
+  if (!numChar) {
     return;
   }
   
   // calls getCharBools to get a list of booleans in the same position order as character object keys
-  var charBoolsActual = getCharBools();
+  var charBools = getCharBools();
   
   // calls charTypeConfirm method from the characters object to create a list of the character types selected
-  var selectedCharTypesActual = characters.charTypeConfirm(charBoolsActual);
+  var selectedCharTypes = characters.charTypeConfirm(charBools);
 
   // validates choices a final time
-  let validateString;
-  if (selectedCharTypesActual === 1) {
-    validateString = `So, you would like a password that is ${numCharActual} characters long and contains only ${selectedCharTypesActual[0]}?`;
-  } else {
-    charTypeString = "";
-    for (i = 0; i < selectedCharTypesActual.length; i++) {
-      if (i !== selectedCharTypesActual - 1) {
-        charTypeString += selectedCharTypesActual[i] + ", ";
-      } else {
-        charTypeString += "and " + selectedCharTypesActual[i];
-      }
-    }
-    validateString = `So, you would like a password that is ${numCharActual} characters long and contains ${charTypeString} characters?`;
-  }
-  
-  let finalValidate = window.confirm(validateString);
+  let finalValidate = window.confirm(getFinalValidate(numChar, selectedCharTypes));
   if (!finalValidate) {
     return generatePassword();
   }
-  
 
   // calls compilePassword from the characters object to generate a password using data from user entries
   window.alert("Okay. Generating your password now...");
-  let pw = characters.compilePassword(numCharActual, selectedCharTypesActual);
+  let password = characters.compilePassword(numChar, selectedCharTypes);
 
-  return pw;
+  return password;
 };
 
-/* Get references to the #generate element */
+/* 
+  Get references to the #generate element 
+  Add event listener to generate button
+*/
 var generateBtn = document.querySelector("#generate");
+generateBtn.addEventListener("click", writePassword);
 
 /* 
   Write password to the #password input
@@ -145,8 +153,4 @@ function writePassword() {
   if (password) {
     passwordText.value = password;
   }
-
 };
-
-// Add event listener to generate button
-generateBtn.addEventListener("click", writePassword);
