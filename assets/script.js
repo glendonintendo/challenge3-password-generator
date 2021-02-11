@@ -6,7 +6,7 @@
 
 /* 
   character object holds arrays of acceptable characters and two methods:
-    1. 
+    1. charType confirm takes an array of booleans, and creates a new array with their relation to characters keys
     2. compilePassword takes the number of requested characters and an array of character types and randomly generates a password character by character
 */
 let characters = {
@@ -14,6 +14,18 @@ let characters = {
   uppercase: ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
   number: ["0","1","2","3","4","5","6","7","8","9"],
   special: [" ","!","\"","#","$","%","&","'","(",")","*","+",",","-",".","/",":",";","<","=",">","?","@","[","\\","]","^","_","`","{","|","}","~"],
+  
+  charTypeConfirm: function(arr) {
+    var selectedCharTypes = [];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i]) {
+        selectedCharTypes.push(Object.keys(this)[i]);
+      }
+    }
+    console.log(selectedCharTypes);
+    return selectedCharTypes;
+  },
+
   compilePassword: function(num, arr) {
     let pwProto = "";
 
@@ -78,7 +90,7 @@ var getCharBools = function() {
   creates a password using previously defined object properties, object methods, and function expressions
 */
 var generatePassword = function() {
-  // calls getNumChar to get length of generated password, if numCharActual is falsy, passes undefined
+  // calls getNumChar to get length of generated password; if numCharActual is falsy, passes undefined
   var numCharActual = getNumChar();
   if (!numCharActual) {
     return;
@@ -87,19 +99,34 @@ var generatePassword = function() {
   // calls getCharBools to get a list of booleans in the same position order as character object keys
   var charBoolsActual = getCharBools();
   
-  // creates a list of the character types selected
-  var selectedCharTypes = [];
-  for (var i = 0; i < charBoolsActual.length; i++) {
-    if (charBoolsActual[i]) {
-      selectedCharTypes.push(Object.keys(characters)[i]);
-    }
-  }
-  console.log(selectedCharTypes);
+  // calls charTypeConfirm method from the characters object to create a list of the character types selected
+  var selectedCharTypesActual = characters.charTypeConfirm(charBoolsActual);
 
-  window.alert("Okay. Generating your password now...");
+  // validates choices a final time
+  let validateString;
+  if (selectedCharTypesActual === 1) {
+    validateString = `So, you would like a password that is ${numCharActual} characters long and contains only ${selectedCharTypesActual[0]}?`;
+  } else {
+    charTypeString = "";
+    for (i = 0; i < selectedCharTypesActual.length; i++) {
+      if (i !== selectedCharTypesActual - 1) {
+        charTypeString += selectedCharTypesActual[i] + ", ";
+      } else {
+        charTypeString += "and " + selectedCharTypesActual[i];
+      }
+    }
+    validateString = `So, you would like a password that is ${numCharActual} characters long and contains ${charTypeString} characters?`;
+  }
+  
+  let finalValidate = window.confirm(validateString);
+  if (!finalValidate) {
+    return generatePassword();
+  }
+  
 
   // calls compilePassword from the characters object to generate a password using data from user entries
-  let pw = characters.compilePassword(numCharActual, selectedCharTypes);
+  window.alert("Okay. Generating your password now...");
+  let pw = characters.compilePassword(numCharActual, selectedCharTypesActual);
 
   return pw;
 };
