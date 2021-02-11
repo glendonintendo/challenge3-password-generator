@@ -37,14 +37,14 @@ let characters = {
       if (i === 0) {
         charPrompt = `Would you like to use ${charArrayKeys[i]} characters in your password?\nClick 'OK' for YES or 'Cancel' for NO.`;
       } else {
-        charPrompt = `${toTitleCase(charArrayKeys[i])} characters?`;
+        charPrompt = `${toTitleCase(charArrayKeys[i])} characters?\nClick 'OK' for YES or 'Cancel' for NO.`;
       }
       charBools.push(window.confirm(charPrompt));
     }
   
     // validates that at least one character type was chosen
     if (!charBools.includes(true)) {
-      window.alert("You must choose one 'OK' for one of the following options in order to generate a password. Let's try again.");
+      window.alert("You must select 'OK' for at least one of the character options in order to generate a password. Let's try again.");
       return this.getCharTypes();
     }
     
@@ -93,7 +93,7 @@ let characters = {
   if 'Cancel' is chosen in the getNumChar prompt, the program will stop generating a password
 */
 const getNumChar = function() {
-  const numChar = window.prompt("How many characters long would you like your password to be? Please choose a whole number between 8 and 128 (inclusive). Then click 'OK'.");
+  const numChar = window.prompt("How many characters would you like your password to be?\nPlease enter a whole number between 8 and 128 (inclusive). Then click 'OK'.");
   if (!numChar) {
     return numChar;
   }
@@ -123,7 +123,7 @@ const getFinalValidate = function (num, arr) {
       charTypesString += " and " + arr[i];
     }
   }
-  const validateString = `So, you would like a password that is ${num} characters long and contains ${charTypesString} characters?`;
+  const validateString = `So, you would like a password that is ${num} characters long and contains ${charTypesString} characters?\nClick 'OK' to generate your password.\nClick 'Cancel' to start over.`;
   return validateString;
 };
 
