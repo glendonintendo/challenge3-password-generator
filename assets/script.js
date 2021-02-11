@@ -7,7 +7,7 @@
 
 /* 
   character object holds arrays of acceptable characters and two methods:
-    1. charType confirm takes an array of booleans, and creates a new array with their relation to characters keys
+    1. getCharTypes prompts user for each char type in keys, converts those booleans into the key names, and returns an array of those key names
     2. compilePassword takes the number of requested characters and an array of character types and randomly generates a password character by character
 */
 let characters = {
@@ -15,11 +15,38 @@ let characters = {
   uppercase: ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
   number: ["0","1","2","3","4","5","6","7","8","9"],
   special: [" ","!","\"","#","$","%","&","'","(",")","*","+",",","-",".","/",":",";","<","=",">","?","@","[","\\","]","^","_","`","{","|","}","~"],
+
+  getCharTypes: function() {
+    const toTitleCase = function(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    let charArrayKeys = []
+    for (i = 0; i < Object.keys(this).length; i++) {
+      if (Array.isArray(this[Object.keys(this)[i]])) {
+        charArrayKeys.push(Object.keys(this)[i]);
+      }
+    }
+
+    let charBools = [];
+    for (let i = 0; i < charArrayKeys.length; i++) {
+      let charPrompt;
+      if (i === 0) {
+        charPrompt = `Would you like to use ${charArrayKeys[i]} characters in your password?\nClick 'OK' for YES or 'Cancel' for NO.`
+      } else {
+        charPrompt = `${toTitleCase(charArrayKeys[i])} characters?`
+      }
+      charBools.push(window.confirm(charPrompt))
+    }
   
-  charTypeConfirm: function(arr) {
-    var selectedCharTypes = [];
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i]) {
+    if (!charBools.includes(true)) {
+      window.alert("You must choose one 'OK' for one of the following options in order to generate a password. Let's try again.")
+      return this.getCharTypes();
+    }
+    
+    let selectedCharTypes = [];
+    for (let i = 0; i < charBools.length; i++) {
+      if (charBools[i]) {
         selectedCharTypes.push(Object.keys(this)[i]);
       }
     }
@@ -66,26 +93,6 @@ var getNumChar = function() {
   }
 };
 
-/* 
-  getCharBools prompts the user four times, once for each character type, and returns a list of booleans
-  if user chooses 'Cancel' on each of the four prompts, the user will be asked to answer 'OK' on at least one of the prompts
-*/
-var getCharBools = function() {
-  var charBools = [
-    window.confirm("Would you like to use lowercase characters in your password? Choose 'OK' for Yes or 'Cancel' for No."),
-    window.confirm("Uppercase characters?"),
-    window.confirm("Numbers?"),
-    window.confirm("Special characters?")
-  ];
-
-  if (charBools.includes(true)) {
-    return charBools;
-  } else {
-    window.alert("You must choose one 'OK' for one of the following options in order to generate a password. Let's try again.")
-    return getCharBools();
-  }
-};
-
 /*
   takes in previous user inputs about password and creates a string of those inputs
 */
@@ -117,20 +124,17 @@ var generatePassword = function() {
   }
   
   // calls getCharBools to get a list of booleans in the same position order as character object keys
-  var charBools = getCharBools();
-  
-  // calls charTypeConfirm method from the characters object to create a list of the character types selected
-  var selectedCharTypes = characters.charTypeConfirm(charBools);
+  var charTypes = characters.getCharTypes();
 
   // validates choices a final time
-  let finalValidate = window.confirm(getFinalValidate(numChar, selectedCharTypes));
+  let finalValidate = window.confirm(getFinalValidate(numChar, charTypes));
   if (!finalValidate) {
     return generatePassword();
   }
 
   // calls compilePassword from the characters object to generate a password using data from user entries
   window.alert("Okay. Generating your password now...");
-  let password = characters.compilePassword(numChar, selectedCharTypes);
+  let password = characters.compilePassword(numChar, charTypes);
 
   return password;
 };
