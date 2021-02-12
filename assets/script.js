@@ -90,20 +90,24 @@ let characters = {
 
 /* 
   getNumChar asks the user for a number between 8-128, parses it to an integer, and returns that integer
+  validates that user input is a whole number between 8-128
   if 'Cancel' is chosen in the getNumChar prompt, the program will stop generating a password
 */
 const getNumChar = function() {
   const numChar = window.prompt("How many characters would you like your password to be?\nPlease enter a whole number between 8 and 128 (inclusive). Then click 'OK'.");
-  if (!numChar) {
-    return numChar;
-  }
-
   const numCharInt = parseInt(numChar);
-  if (typeof numCharInt === "number" && numChar >= 8 && numChar <= 128) {
-    return numCharInt;
-  } else {
+  if (!numChar) {
+    return false;
+  } else if (
+    !numChar.split("").every(i => characters.number.includes(i)) ||
+    typeof numCharInt !== "number" ||
+    numCharInt < 8 ||
+    numCharInt > 128
+  ) {
     window.alert("Please make sure to enter a whole number between 8 and 128 (inclusive). Then click 'OK'.");
     return getNumChar();
+  } else {
+    return numCharInt;
   }
 };
 
